@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from azure.identity import ClientSecretCredential
 from azure.storage.filedatalake import DataLakeServiceClient
+import io
 
 storage_account = "jonoaoedlext"
 container = "dev"
@@ -43,7 +44,7 @@ def download_file_from_adls2(adls2_credential, storage_account, container, file_
         file_content = download.readall().decode('utf-8')  # Decode bytes to string
         
         # Load the file content into a pandas DataFrame
-        df = pd.read_csv(pd.compat.StringIO(file_content))  # Assuming the file is CSV
+        df = pd.read_csv(io.StringIO(file_content)) 
         return df
     except Exception as e:
         st.error(f"Error downloading file: {e}")
