@@ -39,7 +39,7 @@ def download_file_from_adls2(adls2_credential, storage_account, container, file_
 
 
 
-# @st.cache_data
+@st.cache_data
 def get_data():
     
     # Adls2 file location
@@ -160,7 +160,7 @@ def build_graphs(transformed_df):
 
     # Calculate the win percentage
     df_updated['Win Percentage against Opponent Civ'] = (
-        df_updated['Wins_against_Opponent'] / df_updated['Matches_Played']
+        df_updated['Wins_against_Opponent'] / df_updated['Matches_Played'] * 100
     ).round(2)
 
     # Rename columns
