@@ -148,6 +148,7 @@ def build_graphs(transformed_df):
 
     with tab1:
         st.write('This is tab1')
+        st.dataframe(filtered_df)
         # left, right = st.columns(2)
         # with left:
         #     civ_bar_chart = st.bar_chart(
