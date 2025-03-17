@@ -45,7 +45,7 @@ def download_file_from_adls2(adls2_credential, storage_account, container, file_
 
 
 
-@st.cache_data
+# @st.cache_data
 def get_data():
     
     # Adls2 file location
@@ -160,9 +160,9 @@ def build_graphs(transformed_df):
         st.dataframe(filtered_df)
         # left, right = st.columns(2)
         # with left:
-        #     civ_bar_chart = st.bar_chart(
+        #     opponent_civ_bar_chart = st.bar_chart(
         #         data=filtered_df
-        #         ,x='civ'
+        #         ,x='opponent_civ'
         #         ,y='kwh'
         #         )
 
@@ -202,7 +202,7 @@ def update_state(current_query):
 #     df = get_df()
 #     st.dataframe(df)
 #     with filter_col1:
-#         V_STATUS = create_unique_field_list(df, "civ")
+#         V_STATUS = create_unique_field_list(df, "opponent_civ")
 #     with filter_col2:
 #         subject_search = st.text_input("Player Search").lower()
 
