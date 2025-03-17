@@ -252,15 +252,15 @@ blank1, main_title, blank2 = st.columns([2,5,2])
 top1, gap, main_gap, gap2, top3 = st.columns([1,1,5,1,1])
 
 with top1:
-    with st.container(height=50,border=True):
+    with st.container(height=75,border=True):
         st.write("Last Updated: Today!")
     # st.button("Last Updated: Today!", use_container_width=True, disabled=True)
 with main_gap:
-    with st.container(height=50,border=True):
-            st.title(":blue[Age of Empires 2 Analysis]")
+    with st.container(height=75,border=True):
+            st.markdown(":blue-background[Age of Empires 2 Analysis]")
     # st.button("Age of Empires 2 Analysis", use_container_width=True)
 with top3:
-    with st.container(height=50,border=True):
+    with st.container(height=75,border=False):
         st.button("Reset All filters", on_click=reset_state_callback, use_container_width=True)
 
 
