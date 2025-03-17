@@ -64,7 +64,8 @@ def get_data():
     df = download_file_from_adls2(adls2_credential, storage_account, container, file_path)
     df['selected'] = True
     if df is not None:
-        st.toast("Successfuly read data!")
+        pass
+        # st.toast("Successfuly read data!")
     else:
         st.error("Unable to read data.")
     return df
@@ -167,7 +168,7 @@ def build_graphs(transformed_df):
     df_updated = df_updated.rename(columns={
         'civ': 'Civ',
         'opponent_civ': 'Opponent Civ',
-        'matches_played': 'Matches Played',
+        'Matches_Played': 'Matches Played',
         'Wins_against_Opponent': 'Wins against Opponent Civ'
     })
 
@@ -247,8 +248,14 @@ st.set_page_config(layout='wide')
 categorical_filters = ['opponent_civ', 'map', 'match_elo_bucket']
 
 # Title of the Streamlit app
-st.title("Age of Empires 2 Analysis")
-st.button("Reset All filters", on_click=reset_state_callback)
+top1, gap, top2, gap2, top3 = st.columns([5,1,5,1,5])
+
+with top1:
+    st.write("Last Updated: Today!")
+with top2:
+    st.title("Age of Empires 2 Analysis")
+with top3:
+    st.button("Reset All filters", on_click=reset_state_callback)
 
 
 def main():
