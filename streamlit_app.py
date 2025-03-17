@@ -64,6 +64,16 @@ def create_unique_field_list(df, field):
     )
     return result
 
+@st.cache_data
+def get_df():
+    # Download the file and load it into a DataFrame
+    df = download_file_from_adls2(adls2_credential, storage_account, container, file_path)
+    if df is not None:
+        st.write("File downloaded successfully!")
+    else:
+        st.write("Failed to download the file.")
+    return df
+
 
 tab1, tab2, tab3 = st.tabs(["Player Leaderboard", "Civ Counter-picker", "Civ Performance"])
 
@@ -71,15 +81,9 @@ with tab1:
     st.write('Hello')
 with tab2:
     filter_col1, _, filter_col2 = st.columns([5,1,5])
-    # Download the file and load it into a DataFrame
-    df = download_file_from_adls2(adls2_credential, storage_account, container, file_path)
+    df = get_df()
     
-    if df is not None:
-        # Display the DataFrame in Streamlit
-        st.write("File downloaded successfully!")
-        st.dataframe(df)
-    else:
-        st.write("Failed to download the file.")
+
 
 
     with filter_col1:
