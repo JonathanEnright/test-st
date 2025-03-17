@@ -10,7 +10,7 @@ container = "dev"
 file_path = "consumption/vw_opponent_civ_analysis.csv.gz"  # Path to the file in ADLS2
 
 # Title of the Streamlit app
-st.title("Hello World from Streamlit!")
+st.title("Age of Empires 2 Analysis")
 
 # Retrieve secrets from Streamlit's secrets.toml
 my_db_name = st.secrets["DB_USERNAME"]
@@ -56,16 +56,21 @@ def download_file_from_adls2(adls2_credential, storage_account, container, file_
         return None
 
 
-# st.set_page_config(layout="wide",page_icon="chart_with_upwards_trend")
+def create_unique_field_list(df, field):
+    result = st.multiselect(
+    f"{field.title()}:"
+    ,options=df[field].sort_values().unique()
+    ,default=df[field].sort_values().unique() #Selects all by default
+    )
+    return result
 
 
-
-tab1, tab2, tab3 = st.tabs(["Notifications", "Requests", "Feedback"])
+tab1, tab2, tab3 = st.tabs(["Player Leaderboard", "Civ Counter-picker", "Civ Performance"])
 
 with tab1:
     st.write('Hello')
 with tab2:
-
+    filter_col1, _, filter_col2 = st.columns([5,1,5])
     # Download the file and load it into a DataFrame
     df = download_file_from_adls2(adls2_credential, storage_account, container, file_path)
     
@@ -76,18 +81,14 @@ with tab2:
     else:
         st.write("Failed to download the file.")
 
+
+    with filter_col1:
+        V_STATUS = create_unique_field_list(df, "civ")
+    with filter_col2:
+        subject_search = st.text_input("Player Search").lower()
+
 with tab3:
     st.title('Feedback Requests Status')
     st.warning("#### View your Submitted Feedback Requests here and track their status!")
     st.markdown("#### 📬 Add your own requests in the 'Feedback' Tab above")
-st.balloons()
 
-st.title("Hello World from streamlit!")
-
-my_db_name = st.secrets["DB_USERNAME"]
-
-
-
-st.write(my_db_name)
-
-st.balloons()
