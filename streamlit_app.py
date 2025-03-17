@@ -56,7 +56,7 @@ def download_file_from_adls2(adls2_credential, storage_account, container, file_
         return None
 
 
-st.set_page_config(layout="wide",page_icon="chart_with_upwards_trend")
+# st.set_page_config(layout="wide",page_icon="chart_with_upwards_trend")
 
 
 
