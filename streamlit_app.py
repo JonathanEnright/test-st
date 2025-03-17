@@ -56,18 +56,30 @@ def download_file_from_adls2(adls2_credential, storage_account, container, file_
         return None
 
 
+st.set_page_config(layout="wide",page_icon="chart_with_upwards_trend")
 
 
-# Download the file and load it into a DataFrame
-df = download_file_from_adls2(adls2_credential, storage_account, container, file_path)
 
-if df is not None:
-    # Display the DataFrame in Streamlit
-    st.write("File downloaded successfully!")
-    st.dataframe(df)
-else:
-    st.write("Failed to download the file.")
+tab1, tab2, tab3 = st.tabs(["Notifications", "Requests", "Feedback"])
 
+with tab1:
+    st.write('Hello')
+with tab2:
+
+    # Download the file and load it into a DataFrame
+    df = download_file_from_adls2(adls2_credential, storage_account, container, file_path)
+    
+    if df is not None:
+        # Display the DataFrame in Streamlit
+        st.write("File downloaded successfully!")
+        st.dataframe(df)
+    else:
+        st.write("Failed to download the file.")
+
+with tab3:
+    st.title('Feedback Requests Status')
+    st.warning("#### View your Submitted Feedback Requests here and track their status!")
+    st.markdown("#### 📬 Add your own requests in the 'Feedback' Tab above")
 st.balloons()
 
 st.title("Hello World from streamlit!")
