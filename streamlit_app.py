@@ -3,10 +3,11 @@ import pandas as pd
 from azure.identity import ClientSecretCredential
 from azure.storage.filedatalake import DataLakeServiceClient
 import io
+import gzip
 
 storage_account = "jonoaoedlext"
 container = "dev"
-file_path = "consumption/dim_civ_gd.parquet"  # Path to the file in ADLS2
+file_path = "consumption/vw_opponent_civ_analysis.csv.gz"  # Path to the file in ADLS2
 
 # Title of the Streamlit app
 st.title("Hello World from Streamlit!")
@@ -36,17 +37,17 @@ def download_file_from_adls2(adls2_credential, storage_account, container, file_
         # Get the file system client (container)
         file_system_client = adls2_client.get_file_system_client(file_system=container)
         
-        # Get the file client for the specific file
-        file_client = file_system_client.get_file_client(file_path)
-        
-        # Download the file content
+              # Download the file content
         download = file_client.download_file()
-        # file_content = download.readall().decode('utf-8')  # Decode bytes to string
         file_content = download.readall()
         
-        # Load the file content into a pandas DataFrame
-        # df = pd.read_csv(io.StringIO(file_content)) 
-        df = pd.read_parquet(io.BytesIO(file_content)) 
+        # Decompress the file content
+        with gzip.GzipFile(fileobj=io.BytesIO(file_content)) as f:
+            decompressed_content = f.read()
+        
+        # Load the decompressed file content into a pandas DataFrame
+        df = pd.read_csv(io.StringIO(decompressed_content.decode('utf-8')))
+        return df
         return df
     except Exception as e:
         st.error(f"Error downloading file: {e}")
