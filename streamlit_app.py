@@ -6,7 +6,7 @@ import io
 
 storage_account = "jonoaoedlext"
 container = "dev"
-file_path = "country_list/country_list.csv"  # Path to the file in ADLS2
+file_path = "consumption/dim_civ_gd.parquet"  # Path to the file in ADLS2
 
 # Title of the Streamlit app
 st.title("Hello World from Streamlit!")
@@ -41,10 +41,12 @@ def download_file_from_adls2(adls2_credential, storage_account, container, file_
         
         # Download the file content
         download = file_client.download_file()
-        file_content = download.readall().decode('utf-8')  # Decode bytes to string
+        # file_content = download.readall().decode('utf-8')  # Decode bytes to string
+        file_content = download.readall()
         
         # Load the file content into a pandas DataFrame
-        df = pd.read_csv(io.StringIO(file_content)) 
+        # df = pd.read_csv(io.StringIO(file_content)) 
+        df = pd.read_parquet(io.BytesIO(file_content)) 
         return df
     except Exception as e:
         st.error(f"Error downloading file: {e}")
