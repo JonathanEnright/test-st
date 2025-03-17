@@ -7,7 +7,7 @@ import gzip
 from streamlit import session_state as ss
 
 
-categorical_filters = ['division', 'utility']
+categorical_filters = ['civ', 'utility']
 
 # Title of the Streamlit app
 st.title("Age of Empires 2 Analysis")
@@ -114,10 +114,10 @@ def get_filters(transformed_df: pd.DataFrame):
     '''
     left, gap, right = st.columns([5,1,5])
     with left:
-        division_select = st.multiselect(
-            label='Select a division'
-            ,options=sorted(set(transformed_df['division'].tolist()))
-            ,key=f"division_{st.session_state.counter}"
+        civ_select = st.multiselect(
+            label='Select a civ'
+            ,options=sorted(set(transformed_df['civ'].tolist()))
+            ,key=f"civ_{st.session_state.counter}"
             ,placeholder="ALL - (All values are applied)"
         )
 
@@ -132,7 +132,7 @@ def get_filters(transformed_df: pd.DataFrame):
     st.button("Reset All filters", on_click=reset_state_callback)
 
     current_query = {}
-    current_query['division_query'] = [el for el in division_select]
+    current_query['civ_query'] = [el for el in civ_select]
     current_query['utility_query'] = [el for el in utility_select]
 
     return current_query
@@ -150,9 +150,9 @@ def build_graphs(transformed_df):
         st.write('This is tab1')
         # left, right = st.columns(2)
         # with left:
-        #     division_bar_chart = st.bar_chart(
+        #     civ_bar_chart = st.bar_chart(
         #         data=filtered_df
-        #         ,x='division'
+        #         ,x='civ'
         #         ,y='kwh'
         #         )
 
