@@ -7,7 +7,7 @@ import gzip
 from streamlit import session_state as ss
 
 
-categorical_filters = ['civ', 'utility']
+categorical_filters = ['civ', 'map']
 
 # Title of the Streamlit app
 st.title("Age of Empires 2 Analysis")
@@ -122,10 +122,10 @@ def get_filters(transformed_df: pd.DataFrame):
         )
 
     with right:
-        utility_select = st.multiselect(
-            label='Select a utility'
-            ,options=sorted(set(transformed_df['utility'].tolist()))
-            ,key=f"utility_{st.session_state.counter}"
+        map_select = st.multiselect(
+            label='Select a map'
+            ,options=sorted(set(transformed_df['map'].tolist()))
+            ,key=f"map_{st.session_state.counter}"
             ,placeholder="ALL - (All values are applied)"
         )
 
@@ -133,7 +133,7 @@ def get_filters(transformed_df: pd.DataFrame):
 
     current_query = {}
     current_query['civ_query'] = [el for el in civ_select]
-    current_query['utility_query'] = [el for el in utility_select]
+    current_query['map_query'] = [el for el in map_select]
 
     return current_query
 
@@ -157,9 +157,9 @@ def build_graphs(transformed_df):
         #         )
 
         # with right:
-        #     utility_bar_chart = st.bar_chart(
+        #     map_bar_chart = st.bar_chart(
         #         data=filtered_df
-        #         ,x='utility'
+        #         ,x='map'
         #         ,y='kwh'
         #         )
     with tab2:
