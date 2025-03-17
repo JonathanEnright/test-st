@@ -25,6 +25,7 @@ adls2_credential = ClientSecretCredential(
     client_secret=client_secret
 )
 
+# Function to download a file from ADLS2 and load it into a pandas DataFrame
 def download_file_from_adls2(adls2_credential, storage_account, container, file_path):
     try:
         # Create a DataLakeServiceClient
@@ -36,8 +37,8 @@ def download_file_from_adls2(adls2_credential, storage_account, container, file_
         # Get the file system client (container)
         file_system_client = adls2_client.get_file_system_client(file_system=container)
         
-        # Get the file client
-        file_client = file_system_client.get_path_client(file_path)  # <-- Fix: Define file_client properly
+        # Get the file client (FIX: use get_file_client() instead of get_path_client())
+        file_client = file_system_client.get_file_client(file_path)
         
         # Download the file content
         download = file_client.download_file()
