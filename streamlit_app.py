@@ -248,7 +248,7 @@ st.set_page_config(layout='wide')
 categorical_filters = ['opponent_civ', 'map', 'match_elo_bucket']
 
 # Title of the Streamlit app
-top1, gap, top2, gap2, top3 = st.columns([5,1,5,1,5])
+top1, gap, top2, gap2, top3 = st.columns([2,1,5,1,2])
 
 with top1:
     st.write("Last Updated: Today!")
