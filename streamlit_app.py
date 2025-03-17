@@ -187,7 +187,7 @@ def build_graphs(transformed_df):
 
     with tab1:
         st.write('This is tab1')
-        st.dataframe(filtered_df)
+        st.dataframe(df_updated)
         # left, right = st.columns(2)
         # with left:
         #     opponent_civ_bar_chart = st.bar_chart(
