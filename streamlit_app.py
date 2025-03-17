@@ -6,8 +6,8 @@ import io
 import gzip
 from streamlit import session_state as ss
 
-
-categorical_filters = ['civ', 'map']
+st.set_page_config(layout='wide')
+categorical_filters = ['civ', 'map', 'match_elo_bucket_select']
 
 # Title of the Streamlit app
 st.title("Age of Empires 2 Analysis")
@@ -112,8 +112,8 @@ def get_filters(transformed_df: pd.DataFrame):
         Saves the selection into a dictionary which is used to update session_state filters later.
         Reset button can be used as a shortcut which will reset all filters.    
     '''
-    left, gap, right = st.columns([5,1,5])
-    with left:
+    filter1, gap, filter2, gap2, filter3 = st.columns([5,1,5,1,5])
+    with filter1:
         civ_select = st.multiselect(
             label='Select a civ'
             ,options=sorted(set(transformed_df['civ'].tolist()))
@@ -121,11 +121,19 @@ def get_filters(transformed_df: pd.DataFrame):
             ,placeholder="ALL - (All values are applied)"
         )
 
-    with right:
+    with filter2:
         map_select = st.multiselect(
             label='Select a map'
             ,options=sorted(set(transformed_df['map'].tolist()))
             ,key=f"map_{st.session_state.counter}"
+            ,placeholder="ALL - (All values are applied)"
+        )
+    
+    with filter3:
+        match_elo_bucket_select = st.multiselect(
+            label='Select a match_elo_bucket'
+            ,options=sorted(set(transformed_df['match_elo_bucket'].tolist()))
+            ,key=f"match_elo_bucket_{st.session_state.counter}"
             ,placeholder="ALL - (All values are applied)"
         )
 
@@ -134,6 +142,7 @@ def get_filters(transformed_df: pd.DataFrame):
     current_query = {}
     current_query['civ_query'] = [el for el in civ_select]
     current_query['map_query'] = [el for el in map_select]
+    current_query['match_elo_bucket_query'] = [el for el in match_elo_bucket_select]
 
     return current_query
 
