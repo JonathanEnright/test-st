@@ -249,14 +249,14 @@ categorical_filters = ['opponent_civ', 'map', 'match_elo_bucket']
 
 # Title of the Streamlit app
 blank1, main_title, blank2 = st.columns([2,5,2])
-top1, gap, main_gap, gap2, top3 = st.columns([2,1,5,1,2])
+top1, gap, main_gap, gap2, top3 = st.columns([1,1,5,1,1])
 
 with top1:
     st.write("Last Updated: Today!")
 with main_title:
     st.title("Age of Empires 2 Analysis")
 with top3:
-    st.button("Reset All filters", on_click=reset_state_callback)
+    st.button("Reset All filters", on_click=reset_state_callback, use_container_width=True)
 
 
 def main():
