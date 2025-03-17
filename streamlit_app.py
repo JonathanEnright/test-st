@@ -7,7 +7,7 @@ import gzip
 from streamlit import session_state as ss
 
 st.set_page_config(layout='wide')
-categorical_filters = ['civ', 'map', 'match_elo_bucket']
+categorical_filters = ['opponent_civ', 'map', 'match_elo_bucket']
 
 # Title of the Streamlit app
 st.title("Age of Empires 2 Analysis")
@@ -70,9 +70,9 @@ def get_data():
     df = download_file_from_adls2(adls2_credential, storage_account, container, file_path)
     df['selected'] = True
     if df is not None:
-        st.write("File downloaded successfully!")
+        st.toast("Successfuly read data!")
     else:
-        st.write("Failed to download the file.")
+        st.error("Unable to read data.")
     return df
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -114,10 +114,10 @@ def get_filters(transformed_df: pd.DataFrame):
     '''
     filter1, gap, filter2, gap2, filter3 = st.columns([5,1,5,1,5])
     with filter1:
-        civ_select = st.multiselect(
-            label='Select a civ'
-            ,options=sorted(set(transformed_df['civ'].tolist()))
-            ,key=f"civ_{st.session_state.counter}"
+        opponent_civ_select = st.multiselect(
+            label='Select an opponent_civ'
+            ,options=sorted(set(transformed_df['opponent_civ'].tolist()))
+            ,key=f"opponent_civ_{st.session_state.counter}"
             ,placeholder="ALL - (All values are applied)"
         )
 
@@ -140,7 +140,7 @@ def get_filters(transformed_df: pd.DataFrame):
     st.button("Reset All filters", on_click=reset_state_callback)
 
     current_query = {}
-    current_query['civ_query'] = [el for el in civ_select]
+    current_query['opponent_civ_query'] = [el for el in opponent_civ_select]
     current_query['map_query'] = [el for el in map_select]
     current_query['match_elo_bucket_query'] = [el for el in match_elo_bucket_select]
 
