@@ -4,28 +4,16 @@ from azure.identity import ClientSecretCredential
 from azure.storage.filedatalake import DataLakeServiceClient
 import io
 import gzip
+from streamlit import session_state as ss
 
-storage_account = "jonoaoedlext"
-container = "dev"
-file_path = "consumption/vw_opponent_civ_analysis.csv.gz"  # Path to the file in ADLS2
+
+categorical_filters = ['division', 'utility']
 
 # Title of the Streamlit app
 st.title("Age of Empires 2 Analysis")
 
-# Retrieve secrets from Streamlit's secrets.toml
-my_db_name = st.secrets["DB_USERNAME"]
-client_id = st.secrets["azure_client_id"]
-tenant_id = st.secrets["azure_tenant_id"]
-client_secret = st.secrets["azure_client_secret"]
 
-# Create a credential object for Azure authentication
-adls2_credential = ClientSecretCredential(
-    tenant_id=tenant_id,
-    client_id=client_id,
-    client_secret=client_secret
-)
-
-# Function to download a file from ADLS2 and load it into a pandas DataFrame
+# ----------------------------------------------------------------------------------------------------------------------
 def download_file_from_adls2(adls2_credential, storage_account, container, file_path):
     try:
         # Create a DataLakeServiceClient
@@ -56,43 +44,172 @@ def download_file_from_adls2(adls2_credential, storage_account, container, file_
         return None
 
 
-def create_unique_field_list(df, field):
-    result = st.multiselect(
-    f"{field.title()}:"
-    ,options=df[field].sort_values().unique()
-    ,default=df[field].sort_values().unique() #Selects all by default
-    )
-    return result
 
 @st.cache_data
-def get_df():
+def get_data():
+    
+    # Adls2 file location
+    storage_account = "jonoaoedlext"
+    container = "dev"
+    file_path = "consumption/vw_opponent_civ_analysis.csv.gz"  
+
+    # Retrieve secrets from Streamlit's secrets.toml
+    client_id = st.secrets["azure_client_id"]
+    tenant_id = st.secrets["azure_tenant_id"]
+    client_secret = st.secrets["azure_client_secret"]
+
+    # Create a credential object for Azure authentication
+    adls2_credential = ClientSecretCredential(
+        tenant_id=tenant_id,
+        client_id=client_id,
+        client_secret=client_secret
+    )
+    
+    
     # Download the file and load it into a DataFrame
     df = download_file_from_adls2(adls2_credential, storage_account, container, file_path)
+    df['selected'] = True
     if df is not None:
         st.write("File downloaded successfully!")
     else:
         st.write("Failed to download the file.")
     return df
-
-
-tab1, tab2, tab3 = st.tabs(["Player Leaderboard", "Civ Counter-picker", "Civ Performance"])
-
-with tab1:
-    st.write('Hello')
-with tab2:
-    filter_col1, _, filter_col2 = st.columns([5,1,5])
-    df = get_df()
-    
+# ----------------------------------------------------------------------------------------------------------------------
 
 
 
-    with filter_col1:
-        V_STATUS = create_unique_field_list(df, "civ")
-    with filter_col2:
-        subject_search = st.text_input("Player Search").lower()
 
-with tab3:
-    st.title('Feedback Requests Status')
-    st.warning("#### View your Submitted Feedback Requests here and track their status!")
-    st.markdown("#### 📬 Add your own requests in the 'Feedback' Tab above")
+def initialize_state():
+    '''Set session_state for filter variables and counter.'''
+    for col in categorical_filters:
+        if f"{col}_query" not in st.session_state:
+            st.session_state[f"{col}_query"] = []
 
+    if "counter" not in st.session_state:
+        st.session_state.counter = 0
+
+
+def reset_state_callback():
+    '''Reset session_date for filter variables and counter when button clicked.'''
+    st.session_state.counter = 1 + st.session_state.counter
+    for col in categorical_filters:
+        st.session_state[f"{col}_query"] = []
+
+
+def query_data(df: pd.DataFrame) -> pd.DataFrame:
+    '''For each filtering query, checks each row in the df's corresponding column if it 
+        contains the value that is in the session states filter list.
+       If there is no match, that row's `selected` value is changed to False.
+    '''
+    for col in categorical_filters:
+        if st.session_state[f"{col}_query"]:
+            df.loc[~df[col].isin(st.session_state[f"{col}_query"]), "selected"] = False
+    return df
+
+
+def get_filters(transformed_df: pd.DataFrame):
+    '''Splits the page into 2 for both multiselect filters.
+        Saves the selection into a dictionary which is used to update session_state filters later.
+        Reset button can be used as a shortcut which will reset all filters.    
+    '''
+    left, gap, right = st.columns([5,1,5])
+    with left:
+        division_select = st.multiselect(
+            label='Select a division'
+            ,options=sorted(set(transformed_df['division'].tolist()))
+            ,key=f"division_{st.session_state.counter}"
+            ,placeholder="ALL - (All values are applied)"
+        )
+
+    with right:
+        utility_select = st.multiselect(
+            label='Select a utility'
+            ,options=sorted(set(transformed_df['utility'].tolist()))
+            ,key=f"utility_{st.session_state.counter}"
+            ,placeholder="ALL - (All values are applied)"
+        )
+
+    st.button("Reset All filters", on_click=reset_state_callback)
+
+    current_query = {}
+    current_query['division_query'] = [el for el in division_select]
+    current_query['utility_query'] = [el for el in utility_select]
+
+    return current_query
+
+
+def build_graphs(transformed_df):
+    '''Filters the dataframe to only retain selected rows.
+        Utilising some containserisation, create the graphs and data preview objects.
+    '''
+    filtered_df = transformed_df[transformed_df['selected'] == True]
+
+    tab1, tab2 = st.tabs(['Graphs', 'Data'])
+
+    with tab1:
+        st.write('This is tab1')
+        # left, right = st.columns(2)
+        # with left:
+        #     division_bar_chart = st.bar_chart(
+        #         data=filtered_df
+        #         ,x='division'
+        #         ,y='kwh'
+        #         )
+
+        # with right:
+        #     utility_bar_chart = st.bar_chart(
+        #         data=filtered_df
+        #         ,x='utility'
+        #         ,y='kwh'
+        #         )
+    with tab2:
+        left, right = st.columns(2)
+        with left:
+            st.write(transformed_df)
+        with right:
+            st.session_state
+
+
+def update_state(current_query):
+    '''Checks to see if the multi-select options are different to session_state filters.
+        If so, then update them accordenly and re-run the script, else do nothing.
+    '''
+    rerun = False
+    for col in categorical_filters:
+        if current_query[f'{col}_query'] != st.session_state[f'{col}_query']:
+            st.session_state[f'{col}_query'] = current_query[f'{col}_query']
+            rerun = True
+    if rerun:
+        st.rerun()
+
+
+# tab1, tab2, tab3 = st.tabs(["Player Leaderboard", "Civ Counter-picker", "Civ Performance"])
+
+# with tab1:
+#     st.write('Hello')
+# with tab2:
+#     filter_col1, _, filter_col2 = st.columns([5,1,5])
+#     df = get_df()
+#     st.dataframe(df)
+#     with filter_col1:
+#         V_STATUS = create_unique_field_list(df, "civ")
+#     with filter_col2:
+#         subject_search = st.text_input("Player Search").lower()
+
+# with tab3:
+#     st.title('Feedback Requests Status')
+#     st.warning("#### View your Submitted Feedback Requests here and track their status!")
+#     st.markdown("#### 📬 Add your own requests in the 'Feedback' Tab above")
+
+
+
+
+def main():
+    initialize_state()
+    df = get_data()
+    current_query = get_filters(df)
+    transformed_df = query_data(df)
+    build_graphs(transformed_df)
+    update_state(current_query)
+
+main()
