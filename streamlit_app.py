@@ -6,12 +6,6 @@ import io
 import gzip
 from streamlit import session_state as ss
 
-st.set_page_config(layout='wide')
-categorical_filters = ['opponent_civ', 'map', 'match_elo_bucket']
-
-# Title of the Streamlit app
-st.title("Age of Empires 2 Analysis")
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 def download_file_from_adls2(adls2_credential, storage_account, container, file_path):
@@ -115,7 +109,7 @@ def get_filters(transformed_df: pd.DataFrame):
     filter1, gap, filter2, gap2, filter3 = st.columns([5,1,5,1,5])
     with filter1:
         opponent_civ_select = st.multiselect(
-            label='Select an opponent_civ'
+            label='Select the opponent civ to counter against'
             ,options=sorted(set(transformed_df['opponent_civ'].tolist()))
             ,key=f"opponent_civ_{st.session_state.counter}"
             ,placeholder="ALL - (All values are applied)"
@@ -131,13 +125,13 @@ def get_filters(transformed_df: pd.DataFrame):
     
     with filter3:
         match_elo_bucket_select = st.multiselect(
-            label='Select a match_elo_bucket'
+            label='Select the elo range to analyse'
             ,options=sorted(set(transformed_df['match_elo_bucket'].tolist()))
             ,key=f"match_elo_bucket_{st.session_state.counter}"
             ,placeholder="ALL - (All values are applied)"
         )
 
-    st.button("Reset All filters", on_click=reset_state_callback)
+    
 
     current_query = {}
     current_query['opponent_civ_query'] = [el for el in opponent_civ_select]
@@ -152,6 +146,42 @@ def build_graphs(transformed_df):
         Utilising some containserisation, create the graphs and data preview objects.
     '''
     filtered_df = transformed_df[transformed_df['selected'] == True]
+    
+
+        # Group and aggregate the data
+    df_updated = (
+        filtered_df.groupby(['civ', 'opponent_civ'])
+        .agg(
+            Matches_Played=('matches_played', 'sum'),
+            Wins_against_Opponent=('wins', 'sum')
+        )
+        .reset_index()
+    )
+
+    # Calculate the win percentage
+    df_updated['Win Percentage against Opponent Civ'] = (
+        df_updated['Wins_against_Opponent'] / df_updated['Matches_Played']
+    ).round(2)
+
+    # Rename columns
+    df_updated = df_updated.rename(columns={
+        'civ': 'Civ',
+        'opponent_civ': 'Opponent Civ',
+        'Wins_against_Opponent': 'Wins against Opponent Civ'
+    })
+
+    
+    # Optional: Round the win percentage to a desired number of decimals
+    # df_updated['Win Percentage against Opponent Civ'] = df_updated['Win Percentage against Opponent Civ'].round(2)
+
+    # # Reorder columns if necessary
+    # df_updated = df_updated[[
+    #     'Civ', 'Opponent Civ', 'Matches Played',
+    #     'Wins against Opponent Civ', 'Win Percentage against Opponent Civ'
+    # ]]
+
+
+
 
     tab1, tab2 = st.tabs(['Graphs', 'Data'])
 
@@ -212,6 +242,12 @@ def update_state(current_query):
 #     st.markdown("#### 📬 Add your own requests in the 'Feedback' Tab above")
 
 
+st.set_page_config(layout='wide')
+categorical_filters = ['opponent_civ', 'map', 'match_elo_bucket']
+
+# Title of the Streamlit app
+st.title("Age of Empires 2 Analysis")
+st.button("Reset All filters", on_click=reset_state_callback)
 
 
 def main():
