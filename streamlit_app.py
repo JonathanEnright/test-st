@@ -39,7 +39,7 @@ def download_file_from_adls2(adls2_credential, storage_account, container, file_
 
 
 
-@st.cache_data
+# @st.cache_data
 def get_data():
     
     # Adls2 file location
@@ -167,6 +167,7 @@ def build_graphs(transformed_df):
     df_updated = df_updated.rename(columns={
         'civ': 'Civ',
         'opponent_civ': 'Opponent Civ',
+        'matches_played': 'Matches Played',
         'Wins_against_Opponent': 'Wins against Opponent Civ'
     })
 
