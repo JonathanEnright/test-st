@@ -7,7 +7,7 @@ import gzip
 from streamlit import session_state as ss
 
 st.set_page_config(layout='wide')
-categorical_filters = ['civ', 'map', 'match_elo_bucket_select']
+categorical_filters = ['civ', 'map', 'match_elo_bucket']
 
 # Title of the Streamlit app
 st.title("Age of Empires 2 Analysis")
