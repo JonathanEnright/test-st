@@ -244,8 +244,6 @@ tab1, tab2, tab3 = st.tabs(["Player Leaderboard", "Civ Counter-picker", "Civ Per
 
 
 def universal_layout(sub_page_title):
-    st.set_page_config(layout='wide')
-
 
     # Title of the Streamlit app
     blank1, main_title, blank2 = st.columns([2,5,2])
