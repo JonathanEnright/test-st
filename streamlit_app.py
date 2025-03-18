@@ -6,6 +6,8 @@ import io
 import gzip
 from streamlit import session_state as ss
 
+st.set_page_config(layout='wide')
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Global vars to pass through to functions
 storage_account = "jonoaoedlext"
