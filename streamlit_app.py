@@ -247,7 +247,7 @@ def universal_layout(sub_page_title):
     
     # Title of the Streamlit app
     blank1, main_title, blank2 = st.columns([2,5,2])
-    top1, gap, main_gap, gap2, top3 = st.columns([1,1,4,1,1])
+    top1, main_gap, top3 = st.columns([1,4,1])
 
     with top1:
         with st.container(height=75,border=True):
@@ -256,12 +256,13 @@ def universal_layout(sub_page_title):
     with main_gap:
         with st.container(height=75,border=False):
                 st.markdown("### :crossed_swords: **Age of Empires 2 Analysis** :crossed_swords:")
+                st.title(sub_page_title)
         # st.button("Age of Empires 2 Analysis", use_container_width=True)
     with top3:
         with st.container(height=75,border=False):
             st.button("Reset All filters", on_click=reset_state_callback, use_container_width=True)
     
-    st.title(sub_page_title)
+    
 
 
 
