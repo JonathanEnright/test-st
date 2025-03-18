@@ -249,7 +249,7 @@ categorical_filters = ['opponent_civ', 'map', 'match_elo_bucket']
 
 # Title of the Streamlit app
 blank1, main_title, blank2 = st.columns([2,5,2])
-top1, gap, main_gap, gap2, top3 = st.columns([1,1,7,1,1])
+top1, gap, main_gap, gap2, top3 = st.columns([1,1,4,1,1])
 
 with top1:
     with st.container(height=75,border=True):
@@ -257,7 +257,7 @@ with top1:
     # st.button("Last Updated: Today!", use_container_width=True, disabled=True)
 with main_gap:
     with st.container(height=75,border=True):
-            st.markdown("###:blue-background[Age of Empires 2 Analysis]")
+            st.markdown("**:blue-background[Age of Empires 2 Analysis]**")
     # st.button("Age of Empires 2 Analysis", use_container_width=True)
 with top3:
     with st.container(height=75,border=False):
