@@ -6,8 +6,8 @@ import io
 import gzip
 from streamlit import session_state as ss
 
-st.set_page_config(layout='wide')
 
+st.set_page_config(layout='wide')
 # ----------------------------------------------------------------------------------------------------------------------
 # Global vars to pass through to functions
 storage_account = "jonoaoedlext"
@@ -244,7 +244,7 @@ tab1, tab2, tab3 = st.tabs(["Player Leaderboard", "Civ Counter-picker", "Civ Per
 
 
 def universal_layout(sub_page_title):
-
+    
     # Title of the Streamlit app
     blank1, main_title, blank2 = st.columns([2,5,2])
     top1, gap, main_gap, gap2, top3 = st.columns([1,1,4,1,1])
@@ -268,7 +268,7 @@ def universal_layout(sub_page_title):
 def main():
     universal_layout('testingg')
     initialize_state(categorical_filters)
-    df = get_data(categorical_filters)
+    df = get_data(storage_account, container, file_path)
     current_query = get_filters(df)
     transformed_df = query_data(df, categorical_filters)
     build_graphs(transformed_df)
