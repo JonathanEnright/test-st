@@ -256,8 +256,8 @@ with top1:
         st.write("Last Updated: Today!")
     # st.button("Last Updated: Today!", use_container_width=True, disabled=True)
 with main_gap:
-    with st.container(height=75,border=True):
-            st.markdown("### **Age of Empires 2 Analysis**")
+    with st.container(height=75,border=False):
+            st.markdown("### :crossed_swords: **Age of Empires 2 Analysis** :crossed_swords:")
     # st.button("Age of Empires 2 Analysis", use_container_width=True)
 with top3:
     with st.container(height=75,border=False):
