@@ -257,7 +257,7 @@ with top1:
     # st.button("Last Updated: Today!", use_container_width=True, disabled=True)
 with main_gap:
     with st.container(height=75,border=True):
-            st.markdown("**:blue-background[Age of Empires 2 Analysis]**")
+            st.markdown("### **Age of Empires 2 Analysis**")
     # st.button("Age of Empires 2 Analysis", use_container_width=True)
 with top3:
     with st.container(height=75,border=False):
