@@ -6,6 +6,16 @@ import io
 import gzip
 from streamlit import session_state as ss
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Global vars to pass through to functions
+storage_account = "jonoaoedlext"
+container = "dev"
+file_path = "consumption/vw_opponent_civ_analysis.csv.gz"  
+categorical_filters = ['opponent_civ', 'map', 'match_elo_bucket']
+
+
+
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 def download_file_from_adls2(adls2_credential, storage_account, container, file_path):
@@ -40,13 +50,8 @@ def download_file_from_adls2(adls2_credential, storage_account, container, file_
 
 
 # @st.cache_data
-def get_data():
+def get_data(storage_account, container, file_path):
     
-    # Adls2 file location
-    storage_account = "jonoaoedlext"
-    container = "dev"
-    file_path = "consumption/vw_opponent_civ_analysis.csv.gz"  
-
     # Retrieve secrets from Streamlit's secrets.toml
     client_id = st.secrets["azure_client_id"]
     tenant_id = st.secrets["azure_tenant_id"]
@@ -74,7 +79,7 @@ def get_data():
 
 
 
-def initialize_state():
+def initialize_state(categorical_filters):
     '''Set session_state for filter variables and counter.'''
     for col in categorical_filters:
         if f"{col}_query" not in st.session_state:
@@ -84,14 +89,14 @@ def initialize_state():
         st.session_state.counter = 0
 
 
-def reset_state_callback():
+def reset_state_callback(categorical_filters):
     '''Reset session_date for filter variables and counter when button clicked.'''
     st.session_state.counter = 1 + st.session_state.counter
     for col in categorical_filters:
         st.session_state[f"{col}_query"] = []
 
 
-def query_data(df: pd.DataFrame) -> pd.DataFrame:
+def query_data(df: pd.DataFrame, categorical_filters) -> pd.DataFrame:
     '''For each filtering query, checks each row in the df's corresponding column if it 
         contains the value that is in the session states filter list.
        If there is no match, that row's `selected` value is changed to False.
@@ -173,15 +178,6 @@ def build_graphs(transformed_df):
     })
 
     
-    # Optional: Round the win percentage to a desired number of decimals
-    # df_updated['Win Percentage against Opponent Civ'] = df_updated['Win Percentage against Opponent Civ'].round(2)
-
-    # # Reorder columns if necessary
-    # df_updated = df_updated[[
-    #     'Civ', 'Opponent Civ', 'Matches Played',
-    #     'Wins against Opponent Civ', 'Win Percentage against Opponent Civ'
-    # ]]
-
 
 
 
@@ -212,7 +208,7 @@ def build_graphs(transformed_df):
             st.session_state
 
 
-def update_state(current_query):
+def update_state(current_query, categorical_filters):
     '''Checks to see if the multi-select options are different to session_state filters.
         If so, then update them accordenly and re-run the script, else do nothing.
     '''
@@ -225,7 +221,7 @@ def update_state(current_query):
         st.rerun()
 
 
-# tab1, tab2, tab3 = st.tabs(["Player Leaderboard", "Civ Counter-picker", "Civ Performance"])
+tab1, tab2, tab3 = st.tabs(["Player Leaderboard", "Civ Counter-picker", "Civ Performance"])
 
 # with tab1:
 #     st.write('Hello')
@@ -244,33 +240,51 @@ def update_state(current_query):
 #     st.markdown("#### 📬 Add your own requests in the 'Feedback' Tab above")
 
 
-st.set_page_config(layout='wide')
-categorical_filters = ['opponent_civ', 'map', 'match_elo_bucket']
 
-# Title of the Streamlit app
-blank1, main_title, blank2 = st.columns([2,5,2])
-top1, gap, main_gap, gap2, top3 = st.columns([1,1,4,1,1])
+def universal_layout(sub_page_title):
+    st.set_page_config(layout='wide')
 
-with top1:
-    with st.container(height=75,border=True):
-        st.write("Last Updated: Today!")
-    # st.button("Last Updated: Today!", use_container_width=True, disabled=True)
-with main_gap:
-    with st.container(height=75,border=False):
-            st.markdown("### :crossed_swords: **Age of Empires 2 Analysis** :crossed_swords:")
-    # st.button("Age of Empires 2 Analysis", use_container_width=True)
-with top3:
-    with st.container(height=75,border=False):
-        st.button("Reset All filters", on_click=reset_state_callback, use_container_width=True)
+
+    # Title of the Streamlit app
+    blank1, main_title, blank2 = st.columns([2,5,2])
+    top1, gap, main_gap, gap2, top3 = st.columns([1,1,4,1,1])
+
+    with top1:
+        with st.container(height=75,border=True):
+            st.write("Last Updated: Today!")
+        # st.button("Last Updated: Today!", use_container_width=True, disabled=True)
+    with main_gap:
+        with st.container(height=75,border=False):
+                st.markdown("### :crossed_swords: **Age of Empires 2 Analysis** :crossed_swords:")
+        # st.button("Age of Empires 2 Analysis", use_container_width=True)
+    with top3:
+        with st.container(height=75,border=False):
+            st.button("Reset All filters", on_click=reset_state_callback, use_container_width=True)
+    
+    st.title(sub_page_title)
 
 
 
 def main():
-    initialize_state()
-    df = get_data()
+    universal_layout('testingg')
+    initialize_state(categorical_filters)
+    df = get_data(categorical_filters)
     current_query = get_filters(df)
-    transformed_df = query_data(df)
+    transformed_df = query_data(df, categorical_filters)
     build_graphs(transformed_df)
-    update_state(current_query)
+    update_state(current_query, categorical_filters)
 
 main()
+
+
+# General flow:
+# 0. Universal layout, Create a Header, last_updated card, reset button, and sub-header for current page.       --UNIVERSAL
+# 1. Initialise state for all session state variable. This includes creating a 'reset filters' button.          --UNIVERSAL
+# 2. Get the data from adls2                                                                                    --UNIVERSAL in this project
+# 3. Establish filters on the page (the `get_filters` function), this is unique to each page.                   --BESPOKE
+# 4. The `query_data` ticks the rows to apply any filtering on the data dataframe (via a `selected` field)      --UNIVERSAL
+#   NOTE: This is on the backend data of the df, not the one displayed just yet.
+# 5. In `build_graphs` we apply the filtering from the `selected` field, and any other transformations.         --BESPOKE
+#   It is also here we display the dataframe or visual required.
+#   NOTE: This will be the end visual dataframe's data.
+# 6. `updated_state` looks for any filters that have been applied, and reruns the script with the new filters.  --UNIVERSAL
