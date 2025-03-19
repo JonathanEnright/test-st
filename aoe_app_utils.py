@@ -47,22 +47,22 @@ def download_file_from_adls2(adls2_credential, storage_account, container, file_
 def get_data(storage_account, container, file_path):
     
     # Retrieve secrets from Streamlit's secrets.toml
-    # client_id = st.secrets["azure_client_id"]
-    # tenant_id = st.secrets["azure_tenant_id"]
-    # client_secret = st.secrets["azure_client_secret"]
+    client_id = st.secrets["azure_client_id"]
+    tenant_id = st.secrets["azure_tenant_id"]
+    client_secret = st.secrets["azure_client_secret"]
 
     # Create a credential object for Azure authentication
-    # adls2_credential = ClientSecretCredential(
-    #     tenant_id=tenant_id,
-    #     client_id=client_id,
-    #     client_secret=client_secret
-    # )
-
     adls2_credential = ClientSecretCredential(
-        tenant_id=os.getenv("AZURE_TENANT_ID"),
-        client_id=os.getenv("AZURE_CLIENT_ID"),
-        client_secret=os.getenv("AZURE_CLIENT_SECRET")
+        tenant_id=tenant_id,
+        client_id=client_id,
+        client_secret=client_secret
     )
+
+    # adls2_credential = ClientSecretCredential(
+    #     tenant_id=os.getenv("AZURE_TENANT_ID"),
+    #     client_id=os.getenv("AZURE_CLIENT_ID"),
+    #     client_secret=os.getenv("AZURE_CLIENT_SECRET")
+    # )
 
     
     # Download the file and load it into a DataFrame
