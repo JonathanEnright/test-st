@@ -6,9 +6,11 @@ import io
 import gzip
 from streamlit import session_state as ss
 import os
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 
-# load_dotenv() 
+# Load .env only if not on Cloud
+if not os.environ.get('STREAMLIT_CLOUD_RUN', 'False').lower() == 'true':
+    load_dotenv() 
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -45,24 +47,29 @@ def download_file_from_adls2(adls2_credential, storage_account, container, file_
 
 @st.cache_data
 def get_data(storage_account, container, file_path):
-    
-    # Retrieve secrets from Streamlit's secrets.toml
-    client_id = st.secrets["azure_client_id"]
-    tenant_id = st.secrets["azure_tenant_id"]
-    client_secret = st.secrets["azure_client_secret"]
+    """
+    Try to connect to adls2 using either .env variables or streamlit secrets
+    If successful, call the download function to read it as a dataframe
+    """    
 
-    # Create a credential object for Azure authentication
-    adls2_credential = ClientSecretCredential(
-        tenant_id=tenant_id,
-        client_id=client_id,
-        client_secret=client_secret
-    )
+    try:
+        adls2_credential = ClientSecretCredential(
+            tenant_id=os.getenv("AZURE_TENANT_ID"),
+            client_id=os.getenv("AZURE_CLIENT_ID"),
+            client_secret=os.getenv("AZURE_CLIENT_SECRET")
+        )
+    except:
+        # Retrieve secrets from Streamlit's secrets.toml
+        client_id = st.secrets["azure_client_id"]
+        tenant_id = st.secrets["azure_tenant_id"]
+        client_secret = st.secrets["azure_client_secret"]
 
-    # adls2_credential = ClientSecretCredential(
-    #     tenant_id=os.getenv("AZURE_TENANT_ID"),
-    #     client_id=os.getenv("AZURE_CLIENT_ID"),
-    #     client_secret=os.getenv("AZURE_CLIENT_SECRET")
-    # )
+        # Create a credential object for Azure authentication
+        adls2_credential = ClientSecretCredential(
+            tenant_id=tenant_id,
+            client_id=client_id,
+            client_secret=client_secret
+        )
 
     
     # Download the file and load it into a DataFrame
